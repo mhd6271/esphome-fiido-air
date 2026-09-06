@@ -12,8 +12,8 @@ static const char *const TAG = "fiido_bms";
 
 // Custom Fiido service (FEA0 base, Fiido Air): write to FEA2, notify from FEA1.
 static const auto SERVICE_UUID = esp32_ble_tracker::ESPBTUUID::from_raw("c3e6fea0-e966-1000-8000-be99c223df6a");
-static const auto NOTIFY_CHAR_UUID = esp32_ble_tracker::ESPBTUUID::from_raw("c3e6fea1-e966-1000-8000-be99c223df6a");
-static const auto WRITE_CHAR_UUID = esp32_ble_tracker::ESPBTUUID::from_raw("c3e6fea2-e966-1000-8000-be99c223df6a");
+static const auto NOTIFY_CHAR_UUID = esp32_ble_tracker::ESPBTUUID::from_raw("c3e6fea2-e966-1000-8000-be99c223df6a");
+static const auto WRITE_CHAR_UUID  = esp32_ble_tracker::ESPBTUUID::from_raw("c3e6fea1-e966-1000-8000-be99c223df6a");
 
 bool FiidoLink::resolve(ble_client::BLEClient *parent) {
   auto *notify_chr = parent->get_characteristic(SERVICE_UUID, NOTIFY_CHAR_UUID);

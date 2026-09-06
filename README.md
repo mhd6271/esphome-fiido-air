@@ -80,7 +80,7 @@ esp32:
     type: esp-idf
 
 external_components:
-  - source: github://YOURNAME/esphome-fiido-air
+  - source: github://mhd6271/esphome-fiido-air
     components: [fiido_bms]
 
 esp32_ble_tracker:

@@ -258,7 +258,8 @@ the bike is the calmer option.
 Inherited from upstream, so the full C11/M1 entity set is created. What has actually been
 observed on the Air:
 
-![Sensor card in Home Assistant](images/ha-sensors-air.png)
+<img width="347" height="400" alt="image" src="https://github.com/user-attachments/assets/e2271217-b8e7-471d-8de4-17d3374b67aa" />
+
 
 | Entity | Status |
 | --- | --- |

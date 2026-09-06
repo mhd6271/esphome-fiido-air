@@ -63,6 +63,14 @@ The bike's BLE address is not published anywhere; scan for it with nRF Connect o
 ESP32 side: any board that can run `esp32_ble_tracker` + `ble_client`. Reference setup is a
 plain ESP32 dev board on Wi-Fi with the `esp-idf` framework.
 
+Nothing exotic is needed — a generic ESP32 dev board (ESP32-WROOM-32, the kind sold in
+multipacks) is enough, and the ones I use are
+[here](https://link.amazon/B049fpjEo).
+
+> *Affiliate disclosure: that is an Amazon affiliate link. If you buy through it I earn a
+> commission at no extra cost to you. Any equivalent ESP32 board works just as well — this
+> project does not depend on that particular one.*
+
 ---
 
 ## Installing from Home Assistant

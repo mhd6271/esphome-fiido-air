@@ -151,6 +151,9 @@ observed on the Air:
 | PAS Limit (binary sensor) | constant off |
 | everything else | **untested** |
 
+<img width="347" height="400" alt="image" src="https://github.com/user-attachments/assets/0c8e558b-e706-4e7e-9dcc-1c34be35cc15" />
+
+
 The Air is a single-speed bike with a torque sensor and no display, so several upstream
 controls have no physical counterpart here — gear selection, gear count, throttle, speed
 unit. Whether the BMS still accepts writes to those registers is unknown; nothing has been

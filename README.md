@@ -65,6 +65,123 @@ plain ESP32 dev board on Wi-Fi with the `esp-idf` framework.
 
 ---
 
+## Installing from Home Assistant
+
+If you already run ESPHome, skip to [Minimum config](#minimum-config). This section is the
+full path from a stock Home Assistant to a flashed ESP32.
+
+### 1. Install the ESPHome Device Builder add-on
+
+Settings → Add-ons → Add-on Store, search for **ESPHome Device Builder**, install it. The
+first install pulls a container image and can take ten minutes or more.
+
+Before starting it, enable *Start on boot*, *Watchdog* and *Show in sidebar*, then hit
+**Start**. ESPHome now appears in the Home Assistant sidebar.
+
+If the add-on is not in the store, its repository is not registered: ⋮ menu →
+Repositories → add `https://github.com/esphome/home-assistant-addon`.
+
+### 2. Create the device
+
+Open ESPHome Builder from the sidebar → **+ Create device** → give it a name (`ebike`) →
+pick **ESP32** as the platform. Let the wizard write your Wi-Fi credentials when it asks;
+it stores them in `secrets.yaml` and the generated config references them.
+
+The wizard produces a working skeleton. Click **Edit** on the new device and replace the
+contents with the configuration from the next section — but keep the `api:` encryption key
+and the `ota:` password that the wizard generated for you.
+
+### 3. Add the external component
+
+Nothing to download or copy. The `external_components:` block in the config points at this
+repository, and ESPHome fetches the source itself at compile time:
+
+```yaml
+external_components:
+  - source: github://YOURNAME/esphome-fiido-air
+    components: [fiido_bms]
+    refresh: always
+```
+
+`refresh: always` matters while you are iterating — without it ESPHome caches the fetched
+repository for 24 hours and will happily rebuild from a stale copy after you push a change.
+Drop it once things are stable.
+
+If you want to edit the component locally instead — quicker for experiments, since there is
+no push between attempts — copy `components/fiido_bms/` to `/config/esphome/components/fiido_bms/`
+using the File Editor or Studio Code Server add-on, and point at it with:
+
+```yaml
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [fiido_bms]
+```
+
+The path is relative to the YAML file.
+
+### 4. Flash the ESP32
+
+**The first flash has to happen over USB.** OTA only works once ESPHome is already running
+on the board.
+
+Connect the ESP32 to the machine your browser is running on, then in ESPHome Builder click
+the ⋮ menu next to the device → **Install** → **Plug into this computer**. ESPHome compiles
+(several minutes on the first build), then offers **Open USB flasher**, which hands over to
+ESPHome Web in a new tab. Pick the serial port and let it write.
+
+Use a Chromium-based browser — Chrome or Edge. Firefox and Safari do not support WebSerial
+and cannot flash. Also make sure you have a USB *data* cable; charge-only cables are a
+classic time sink. Some boards need a button held to enter download mode.
+
+If the ESP32 is physically plugged into the Home Assistant server rather than your laptop,
+choose **Plug into your Home Assistant server** instead and skip the browser step.
+
+Every later change installs wirelessly: same menu, **Install** → **Wirelessly**.
+
+### 5. Adopt in Home Assistant
+
+Once the board boots and joins Wi-Fi, Home Assistant discovers it under Settings → Devices
+& Services. Confirm, and paste the API encryption key from your YAML when prompted.
+
+At this point the device exists but has no data yet — you still need the bike's BLE address
+in `ble_client.mac_address`. See [Finding your bike's MAC](#finding-your-bikes-mac).
+
+---
+
+## Finding your bike's MAC
+
+The address is not printed anywhere on the bike. Two ways to get it:
+
+**nRF Connect** (free, Android/iOS, no extra hardware): scan with the bike switched on and
+look for a device that appears when you wake the bike and vanishes when it sleeps. On iOS
+you get an opaque UUID rather than a MAC, so use Android if you can.
+
+**The ESP itself**, which avoids the chicken-and-egg problem of the phone occupying the
+bike's only BLE connection slot:
+
+```yaml
+esp32_ble_tracker:
+  scan_parameters:
+    active: true
+  on_ble_advertise:
+    then:
+      - lambda: |-
+          ESP_LOGD("ble_scan", "%s | %s | %d",
+                   x.address_str().c_str(),
+                   x.get_name().c_str(), x.get_rssi());
+```
+
+Flash that, watch the logs, wake the bike, and look for the address that shows up. Remove
+the block afterwards — it is noisy.
+
+Check that the address is stable across a power cycle of the bike. A first byte whose top
+two bits are `01` (for example `41:42:…`) indicates a resolvable private address, which
+rotates and cannot be pinned in `ble_client`.
+
+---
+
 ## Minimum config
 
 Requires **ESPHome 2025.7.0 or newer** (the component uses the sub-device API).
@@ -80,7 +197,7 @@ esp32:
     type: esp-idf
 
 external_components:
-  - source: github://mhd6271/esphome-fiido-air
+  - source: github://YOURNAME/esphome-fiido-air
     components: [fiido_bms]
 
 esp32_ble_tracker:
@@ -141,18 +258,20 @@ the bike is the calmer option.
 Inherited from upstream, so the full C11/M1 entity set is created. What has actually been
 observed on the Air:
 
+![Sensor card in Home Assistant](images/ha-sensors-air.png)
+
 | Entity | Status |
 | --- | --- |
 | Battery SOC | works |
-| Battery Voltage | works |
+| Battery Voltage | works — note the Air is a 36 V pack, not 48 V like the C11 and M1 |
+| Speed | works |
+| Total Distance | works |
+| Trip Distance | works |
 | BLE Connected | works |
 | Motor Temperature | reads constant 0 °C — sensor may not exist on this drive |
 | Speed Limit (select) | `unknown`, never populated |
 | PAS Limit (binary sensor) | constant off |
 | everything else | **untested** |
-
-<img width="347" height="400" alt="image" src="https://github.com/user-attachments/assets/0c8e558b-e706-4e7e-9dcc-1c34be35cc15" />
-
 
 The Air is a single-speed bike with a torque sensor and no display, so several upstream
 controls have no physical counterpart here — gear selection, gear count, throttle, speed

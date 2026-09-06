@@ -33,7 +33,7 @@ The document is split in two:
 The component speaks the BLE protocol of the official Fiido app (`com.fiido.meter`).
 That protocol is model-agnostic: the same frame format and register map are used
 across the adult Fiido ebike line, so the component is not tied to one model. It
-was developed and verified empirically on a Fiido C11 Pro and a Fiido M1 Pro 2025;
+was developed and verified empirically on a Fiido AIR;
 everything here was confirmed on that hardware unless noted. Other adult Fiido
 ebikes exposing the same `Fiido_*` BLE service are likely compatible but untested -
 reports and PRs welcome. The K1 / Kidz children's line uses a different register
@@ -41,8 +41,7 @@ layout and is not covered.
 
 | Bike                  | BLE name        | MAC (example)       | Spec             |
 |-----------------------|-----------------|---------------------|------------------|
-| Fiido C11 Pro         | `Fiido_C11Pro`  | `XX:XX:XX:XX:XX:XX` | 48V/11.6Ah, 350W, 28 inch |
-| Fiido M1 Pro 2025     | `Fiido_M1PRO`   | `XX:XX:XX:XX:XX:XX` | 48V/11.6Ah, 500W, 22 inch |
+| Fiido AIR         | `Fiido_XXXX`  | `XX:XX:XX:XX:XX:XX` | 36V/11.6Ah, 350W, 28 inch |
 
 MACs above are placeholders; scan your bike with any BLE tool to get the real
 address and substitute it in `ble_client.mac_address`.
